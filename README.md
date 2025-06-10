@@ -7,7 +7,7 @@
 <h1 align="center">💻 Alpha OS - Advanced Learning Platform 🚀</h1>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/username/repo/main/assets/alphaos-banner.png" alt="Alpha OS Banner" width="80%" />
+  <img src="https://assets.grok.com/users/2905aac8-7aa7-40f7-83a6-de2fd8301b35/generated/jjMSYk9aBsKbhf3C/image.jpg" alt="Alpha OS Banner" width="80%" />
 </p>
 
 > **Where Security Meets Innovation!** 🌟<br>
