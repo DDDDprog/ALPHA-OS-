@@ -43,6 +43,7 @@
 
 ```bash
 make install-deps     # Install dependencies
+mkdir build
 make test             # Run tests
 make shell-test       # Try the interactive shell
 make iso              # Build Alpha OS
