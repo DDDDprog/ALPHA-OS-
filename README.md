@@ -7,7 +7,7 @@
 <h1 align="center">💻 Alpha OS - Advanced Learning Platform 🚀</h1>
 
 <p align="center">
-  <img src="https://assets.grok.com/users/2905aac8-7aa7-40f7-83a6-de2fd8301b35/generated/jjMSYk9aBsKbhf3C/Build-Year-2025-orange?style=for-the-badge" alt="Alpha OS Banner" width="80%" />
+  <img src="https://assets.grok.com/users/2905aac8-7aa7-40f7-83a6-de2fd8301b35/generated/" alt="Alpha OS Banner" width="80%" />
 </p>
 
 > **Where Security Meets Innovation!** 🌟<br>
