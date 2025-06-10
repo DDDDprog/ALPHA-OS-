@@ -4,7 +4,7 @@
   <img src="https://img.shields.io/badge/Build-Year-2025-orange?style=for-the-badge" />
 </p>
 
-<h1 align="center">💻 Alpha OS - Advanced Learning Platform 2025 🚀</h1>
+<h1 align="center">💻 Alpha OS - Advanced Learning Platform 🚀</h1>
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/username/repo/main/assets/alphaos-banner.png" alt="Alpha OS Banner" width="80%" />
