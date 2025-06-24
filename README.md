@@ -4,7 +4,7 @@
   <img src="https://img.shields.io/badge/Build-Year-2025-orange?style=for-the-badge" />
 </p>
 
-<h1 align="center">💻 Alpha OS - Advanced Learning Platform 🚀</h1>
+<h1 align="center">💻 Alpha OS - Advanced Learning Platform 🚀BY Dipanjan Dhar</h1>
 
 <p align="center">
   <img src="https://assets.grok.com/users/2905aac8-7aa7-40f7-83a6-de2fd8301b35/generated/" alt="Alpha OS Banner" width="80%" />
