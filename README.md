@@ -1,3 +1,5 @@
+Create By Dipanjan Dhar
+
 <p align="center">
   <img src="https://img.shields.io/badge/OS-AlphaOS-7F3FBF?style=for-the-badge&logo=linux&logoColor=white" alt="Alpha OS Logo" />
   <img src="https://img.shields.io/badge/Version-1.0.0-blue?style=for-the-badge" alt="Version" />
