@@ -3,7 +3,7 @@
 
 #ifdef TEST_MODE
 #include <stdlib.h>
-#include <stdio.h>  // Add this line for printf in error messages
+#include <stdio.h>  
 
 // In test mode, use system malloc/free
 void memory_init(void) {
