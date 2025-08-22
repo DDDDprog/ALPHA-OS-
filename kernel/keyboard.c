@@ -1,6 +1,6 @@
 #include "../include/kernel/keyboard.h"
 #include "../include/kernel/system.h"
-#include "../include/kernel/console.h"  // Add this line
+#include "../include/kernel/console.h" 
 #include "../include/libc/string.h"
 
 #ifdef TEST_MODE
