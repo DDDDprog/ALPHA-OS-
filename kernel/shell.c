@@ -6,6 +6,7 @@
 #include "../include/kernel/system.h"
 #include "../include/kernel/login.h"
 #include "../include/kernel/score.h"
+#include "../include/kernel/boot_info.h"
 #include "../include/libc/stdio.h"
 #include "../include/libc/stdlib.h"
 #include "../include/libc/string.h"
@@ -91,6 +92,8 @@ void shell_init(void) {
     shell_register_command("logout", cmd_logout, "Logout from system", "logout");
     shell_register_command("passwd", cmd_passwd, "Change password", "passwd [username]");
     shell_register_command("score", cmd_score, "Show user score", "score");
+    shell_register_command("sysinfo", cmd_sysinfo, "Show system hardware info", "sysinfo");
+    shell_register_command("neofetch", cmd_neofetch, "Show system info with logo", "neofetch");
     shell_register_command("achievements", cmd_achievements, "Show achievements", "achievements");
     shell_register_command("hostname", cmd_hostname, "Display or set hostname", "hostname [name]");
     shell_register_command("uptime", cmd_uptime, "Show system uptime", "uptime");
@@ -777,6 +780,76 @@ static void cmd_achievements(int argc, char* argv[]) {
     char buffer[512];
     achievement_list(user, buffer, sizeof(buffer));
     printf("\n=== ACHIEVEMENTS ===\n%s", buffer);
+}
+
+static void cmd_sysinfo(int argc, char* argv[]) {
+    (void)argc; (void)argv;
+    boot_show_all();
+}
+
+static void cmd_neofetch(int argc, char* argv[]) {
+    (void)argc; (void)argv;
+    
+    console_set_color(COLOR_CYAN, COLOR_BLACK);
+    printf("                    ............                  \n");
+    printf("               .......:...........               \n");
+    printf("            ...:NNNM...........:DD..            \n");
+    printf("          ..NNMMMNNN...........8MMMN:..         \n");
+    printf("         .DMMN+:..         ..:$OMMMMN..        \n");
+    printf("        .NMMN.     .. ...:.  ...NMMMD..        \n");
+    printf("       .NMM8    .:DMMN88888NNM+.  .NMMD.       \n");
+    printf("      .NMM8    .NMM8....... .NM8   .MMN.       \n");
+    printf("      .MMN.   .MMM.          .MM:   .MM8       \n");
+    printf("      .MMN.   .MMM.          .MM:   .MM8       \n");
+    printf("       DMM:   .MMM.          .MM:   .MMN.      \n");
+    printf("       .MMN.  .MMM.          .MM:   .MMN.      \n");
+    printf("        DMM:  .MMM.          .MM:   .MMN.      \n");
+    printf("        .MMN.  .NMM.         .MM:   .MM8.      \n");
+    printf("         .MMN.  .NMM:       .MM8    MMN.       \n");
+    printf("          .DMN.   .8MMN:    .NMM.  .MMN.       \n");
+    printf("           .NMN.    .+NMMN..NMM+..MMN:         \n");
+    printf("            .NM8:..... ..:...::MMN..           \n");
+    printf("              .8MMMMMMMMMMMMMMM8:.             \n");
+    printf("                 ..............                \n");
+    
+    console_set_color(COLOR_WHITE, COLOR_BLACK);
+    printf("\n");
+    printf("  \033[1;36m  ▄████ ▓█████  ███▄    █ ▓█████   ██████  ██▓  ██████\033[0m\n");
+    printf("  \033[1;36m ██▒ ▀█▒▓█   ▀  ██ ▀█   █ ▓█   ▀ ▒██    ▒ ▓██▒▒██    ▒\033[0m\n");
+    printf("  \033[1;36m▓██    ▒▒███   ▓██  ▀█ █ ▒███   ░ ▓██▄   ▒▒██▒░ ▓██▄  \033[0m\n");
+    printf("  \033[1;36m▒██    █▒▓█  ▄ ▓██▒  ▐▌██▒▓█  ▄   ▒   ██▒░██░  ▒   ██▒\033[0m\n");
+    printf("  \033[1;36m▒██▄   ██░▒████▒██░   ▓██░▒████▒▒██████▒▒░██░▒██████▒▒\033[0m\n");
+    printf("  \033[1;36m░▒████▓░░░░░░ ░▒ ░  ░ ░  ░░ ▒░ ░▒ ▒▓▒ ▒ ░░▓  ▒ ▒▓▒ ▒ ░\033[0m\n");
+    printf("  \033[1;36m░▒   ▒ ░░░ ░ ░ ░      ░   ░ ░  ░░ ░▒  ░ ░ ▒  ░ ░▒  ░\033[0m\n");
+    printf("  \033[1;36m░          ░         ░   ░  ░░  ░   ░  ░  ░  ░  ░  ░\033[0m\n");
+    printf("\n");
+    
+    printf("        \033[1;32m███████████████████████\033[0m  \n");
+    printf("        \033[1;32m█\033[0m       \033[1;36mALPHA OS\033[0m        \033[1;32m█\033[0m  \n");
+    printf("        \033[1;32m███████████████████████\033[0m  \n");
+    
+    printf("\n");
+    printf("\033[1;33mOS:\033[0m Alpha OS 1.0.0 (alpha)\n");
+    printf("\033[1;33mHost:\033[0m QEMU Virtual Machine\n");
+    printf("\033[1;33mKernel:\033[0m Alpha 1.0.0-alpha\n");
+    printf("\033[1;33mUptime:\033[0m %u hours, %u mins\n", 0, 0);
+    printf("\033[1;33mShell:\033[0m AlphaShell 1.0\n");
+    printf("\033[1;33mResolution:\033[0m 80x25\n");
+    printf("\n");
+    
+    printf("\033[1;33mCPU:\033[0m %s\n", boot_cpu.brand);
+    printf("\033[1;33mCPU Cores:\033[0m %u @ %uMHz\n", boot_cpu.cores, boot_cpu.frequency);
+    
+    uint64_t total_gb = boot_mem.total / (1024ULL * 1024 * 1024);
+    printf("\033[1;33mMemory:\033[0m %llu GB / %llu GB\n", 
+           boot_mem.free / (1024ULL * 1024 * 1024), total_gb);
+    
+    if (boot_gpu.present) {
+        printf("\033[1;33mGPU:\033[0m %s (%u MB)\n", boot_gpu.name, boot_gpu.vram);
+    }
+    
+    printf("\n");
+    console_set_color(COLOR_WHITE, COLOR_BLACK);
 }
 
 static void cmd_whoami(int argc, char* argv[]) {
