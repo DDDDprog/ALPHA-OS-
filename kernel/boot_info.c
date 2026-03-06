@@ -86,8 +86,8 @@ int cpu_detect(cpu_info_t* info) {
     /* For now, detect based on compile target */
     #endif
     
-    strcpy(info->vendor, "GenuineIntel");
-    strcpy(info->brand, "Intel(R) Core(TM) i7-9700K CPU @ 3.60GHz");
+    strcpy(info->vendor, "AuthenticAMD");
+    strcpy(info->brand, "AMD Ryzen 7 5800X 8-Core Processor");
     info->cores = 4;
     info->threads = 8;
     info->frequency = 3600;

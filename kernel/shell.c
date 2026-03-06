@@ -1104,7 +1104,7 @@ static void cmd_dmesg(int argc, char* argv[]) {
 
 static void cmd_uname(int argc, char* argv[]) {
     if (argc > 1 && strcmp(argv[1], "-a") == 0) {
-        printf("AlphaOS 2.0.0 phoenix #1 SMP 2026-03-06 x86_64 GNU/Linux\n");
+        printf("AlphaOS 2.0.0 phoenix #1 SMP 2026-03-06 x86_64 AlphaOS\n");
     } else if (argc > 1 && strcmp(argv[1], "-r") == 0) {
         printf("2.0.0-phoenix\n");
     } else if (argc > 1 && strcmp(argv[1], "-s") == 0) {
