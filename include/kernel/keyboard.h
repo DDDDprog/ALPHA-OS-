@@ -31,3 +31,8 @@ void keyboard_clear_buffer(void);
 void keyboard_poll(void);
 
 #endif // KEYBOARD_H
+
+// Command history functions
+void keyboard_add_history(const char* cmd);
+int keyboard_get_history_count(void);
+const char* keyboard_get_history(int index);

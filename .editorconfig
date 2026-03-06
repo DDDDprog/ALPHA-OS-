@@ -1,0 +1,55 @@
+# Alpha OS - Editor Configuration
+# https://editorconfig.org
+
+root = true
+
+# All files
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# C source files
+[*.c]
+indent_style = space
+indent_size = 4
+
+# Header files
+[*.h]
+indent_style = space
+indent_size = 4
+
+# Assembly files
+[*.{asm,S}]
+indent_style = space
+indent_size = 4
+
+# Linker scripts
+[*.ld]
+indent_style = space
+indent_size = 4
+
+# CMake files
+[CMakeLists.txt]
+indent_style = space
+indent_size = 4
+
+[*.cmake]
+indent_style = space
+indent_size = 4
+
+# Makefiles
+[Makefile]
+indent_style = tab
+
+# Documentation
+[*.md]
+indent_style = space
+indent_size = 2
+trim_trailing_whitespace = false
+
+# JSON files
+[*.json]
+indent_style = space
+indent_size = 2

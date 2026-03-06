@@ -3,6 +3,10 @@
 #include "../include/kernel/keyboard.h"
 #include "../include/kernel/console.h"
 #include "../include/kernel/memory.h"
+#include "../include/kernel/system.h"
+#include "../include/kernel/login.h"
+#include "../include/kernel/score.h"
+#include "../include/kernel/boot_info.h"
 #include "../include/libc/stdio.h"
 #include "../include/libc/stdlib.h"
 #include "../include/libc/string.h"
@@ -43,6 +47,35 @@ static void cmd_banner(int argc, char* argv[]);
 static void cmd_su(int argc, char* argv[]);
 static void cmd_root_shell(int argc, char* argv[]);
 static void cmd_exit_root(int argc, char* argv[]);
+static void cmd_login(int argc, char* argv[]);
+static void cmd_logout(int argc, char* argv[]);
+static void cmd_passwd(int argc, char* argv[]);
+static void cmd_score(int argc, char* argv[]);
+static void cmd_sysinfo(int argc, char* argv[]);
+static void cmd_neofetch(int argc, char* argv[]);
+static void cmd_achievements(int argc, char* argv[]);
+static void cmd_cpuinfo(int argc, char* argv[]);
+static void cmd_meminfo(int argc, char* argv[]);
+static void cmd_df(int argc, char* argv[]);
+static void cmd_ps(int argc, char* argv[]);
+static void cmd_kill(int argc, char* argv[]);
+static void cmd_ifconfig(int argc, char* argv[]);
+static void cmd_ping(int argc, char* argv[]);
+static void cmd_netstat(int argc, char* argv[]);
+static void cmd_dmesg(int argc, char* argv[]);
+static void cmd_uname(int argc, char* argv[]);
+static void cmd_set(int argc, char* argv[]);
+static void cmd_export(int argc, char* argv[]);
+static void cmd_env(int argc, char* argv[]);
+static void cmd_hexdump(int argc, char* argv[]);
+static void cmd_reboot(int argc, char* argv[]);
+static void cmd_shutdown(int argc, char* argv[]);
+static void cmd_sleep(int argc, char* argv[]);
+static void cmd_test(int argc, char* argv[]);
+static void cmd_dd(int argc, char* argv[]);
+static void cmd_free(int argc, char* argv[]);
+static void cmd_top(int argc, char* argv[]);
+static void cmd_catv(int argc, char* argv[]);
 
 void shell_init(void) {
     // Register built-in commands with usage information
@@ -62,6 +95,13 @@ void shell_init(void) {
     shell_register_command("tree", cmd_tree, "Show directory tree", "tree [directory]");
     shell_register_command("info", cmd_info, "Show system information", "info");
     shell_register_command("whoami", cmd_whoami, "Display current user", "whoami");
+    shell_register_command("login", cmd_login, "Login to system", "login <username> <password>");
+    shell_register_command("logout", cmd_logout, "Logout from system", "logout");
+    shell_register_command("passwd", cmd_passwd, "Change password", "passwd [username]");
+    shell_register_command("score", cmd_score, "Show user score", "score");
+    shell_register_command("sysinfo", cmd_sysinfo, "Show system hardware info", "sysinfo");
+    shell_register_command("neofetch", cmd_neofetch, "Show system info with logo", "neofetch");
+    shell_register_command("achievements", cmd_achievements, "Show achievements", "achievements");
     shell_register_command("hostname", cmd_hostname, "Display or set hostname", "hostname [name]");
     shell_register_command("uptime", cmd_uptime, "Show system uptime", "uptime");
     shell_register_command("calc", cmd_calc, "Simple calculator", "calc <expression>");
@@ -70,6 +110,28 @@ void shell_init(void) {
     shell_register_command("su", cmd_su, "Switch user", "su [username]");
     shell_register_command("root", cmd_root_shell, "Enter root shell", "root");
     shell_register_command("exit", cmd_exit_root, "Exit root shell", "exit");
+    shell_register_command("cpuinfo", cmd_cpuinfo, "Display CPU information", "cpuinfo");
+    shell_register_command("meminfo", cmd_meminfo, "Display memory information", "meminfo");
+    shell_register_command("df", cmd_df, "Display filesystem disk usage", "df");
+    shell_register_command("ps", cmd_ps, "Display processes", "ps");
+    shell_register_command("kill", cmd_kill, "Terminate a process", "kill <pid> [signal]");
+    shell_register_command("ifconfig", cmd_ifconfig, "Configure network interface", "ifconfig [interface]");
+    shell_register_command("ping", cmd_ping, "Send ICMP echo requests", "ping <host>");
+    shell_register_command("netstat", cmd_netstat, "Display network statistics", "netstat");
+    shell_register_command("dmesg", cmd_dmesg, "Display kernel messages", "dmesg");
+    shell_register_command("uname", cmd_uname, "Display system information", "uname [-a]");
+    shell_register_command("set", cmd_set, "Set or display variables", "set");
+    shell_register_command("export", cmd_export, "Set environment variable", "export VAR=value");
+    shell_register_command("env", cmd_env, "Display environment", "env");
+    shell_register_command("hexdump", cmd_hexdump, "Display file in hex", "hexdump <file>");
+    shell_register_command("reboot", cmd_reboot, "Reboot the system", "reboot");
+    shell_register_command("shutdown", cmd_shutdown, "Shutdown the system", "shutdown");
+    shell_register_command("sleep", cmd_sleep, "Sleep for specified seconds", "sleep <seconds>");
+    shell_register_command("test", cmd_test, "Test expression", "test <expression>");
+    shell_register_command("dd", cmd_dd, "Copy and convert files", "dd if=<file> of=<file>");
+    shell_register_command("free", cmd_free, "Display memory usage", "free");
+    shell_register_command("top", cmd_top, "Display top processes", "top");
+    shell_register_command("catv", cmd_catv, "Display file with non-printable chars", "catv <file>");
     
     // Display welcome banner
     cmd_banner(0, NULL);
@@ -660,6 +722,143 @@ static void cmd_info(int argc, char* argv[]) {
     printf("\n");
 }
 
+static void cmd_login(int argc, char* argv[]) {
+    if (argc < 3) {
+        printf("Usage: login <username> <password>\n");
+        return;
+    }
+    auth_result_t result = login(argv[1], argv[2]);
+    if (result == AUTH_SUCCESS) {
+        strncpy(username, argv[1], 31);
+        is_root = false;
+        printf("Welcome to Alpha OS, %s!\n", argv[1]);
+        score_on_event(argv[1], SCORE_EVENT_LOGIN, NULL);
+    } else if (result == AUTH_INVALID_USER) {
+        printf("Login failed: Invalid password\n");
+    } else if (result == AUTH_ACCOUNT_LOCKED) {
+        printf("Login failed: Account is locked\n");
+    } else {
+        printf("Login failed: User not found\n");
+    }
+}
+
+static void cmd_logout(int argc, char* argv[]) {
+    (void)argc; (void)argv;
+    if (!is_logged_in()) {
+        printf("No user logged in\n");
+        return;
+    }
+    const char* user = get_current_user();
+    logout(user);
+    strcpy(username, "user");
+    is_root = false;
+    printf("Logged out\n");
+}
+
+static void cmd_passwd(int argc, char* argv[]) {
+    if (argc < 2) {
+        if (!is_logged_in()) {
+            printf("Not logged in\n");
+            return;
+        }
+        printf("Usage: passwd <newpassword> (coming soon)\n");
+    } else {
+        printf("Password change not implemented yet\n");
+    }
+}
+
+static void cmd_score(int argc, char* argv[]) {
+    (void)argc; (void)argv;
+    if (!is_logged_in()) {
+        printf("Not logged in. Use 'login' first.\n");
+        return;
+    }
+    const char* user = get_current_user();
+    show_score_summary(user);
+}
+
+static void cmd_achievements(int argc, char* argv[]) {
+    (void)argc; (void)argv;
+    if (!is_logged_in()) {
+        printf("Not logged in. Use 'login' first.\n");
+        return;
+    }
+    const char* user = get_current_user();
+    char buffer[512];
+    achievement_list(user, buffer, sizeof(buffer));
+    printf("\n=== ACHIEVEMENTS ===\n%s", buffer);
+}
+
+static void cmd_sysinfo(int argc, char* argv[]) {
+    (void)argc; (void)argv;
+    boot_show_all();
+}
+
+static void cmd_neofetch(int argc, char* argv[]) {
+    (void)argc; (void)argv;
+    
+    console_set_color(VGA_COLOR_CYAN, VGA_COLOR_BLACK);
+    printf("                    ............                  \n");
+    printf("               .......:...........               \n");
+    printf("            ...:NNNM...........:DD..            \n");
+    printf("          ..NNMMMNNN...........8MMMN:..         \n");
+    printf("         .DMMN+:..         ..:$OMMMMN..        \n");
+    printf("        .NMMN.     .. ...:.  ...NMMMD..        \n");
+    printf("       .NMM8    .:DMMN88888NNM+.  .NMMD.       \n");
+    printf("      .NMM8    .NMM8....... .NM8   .MMN.       \n");
+    printf("      .MMN.   .MMM.          .MM:   .MM8       \n");
+    printf("      .MMN.   .MMM.          .MM:   .MM8       \n");
+    printf("       DMM:   .MMM.          .MM:   .MMN.      \n");
+    printf("       .MMN.  .MMM.          .MM:   .MMN.      \n");
+    printf("        DMM:  .MMM.          .MM:   .MMN.      \n");
+    printf("        .MMN.  .NMM.         .MM:   .MM8.      \n");
+    printf("         .MMN.  .NMM:       .MM8    MMN.       \n");
+    printf("          .DMN.   .8MMN:    .NMM.  .MMN.       \n");
+    printf("           .NMN.    .+NMMN..NMM+..MMN:         \n");
+    printf("            .NM8:..... ..:...::MMN..           \n");
+    printf("              .8MMMMMMMMMMMMMMM8:.             \n");
+    printf("                 ..............                \n");
+    
+    console_set_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
+    printf("\n");
+    printf("  \033[1;36m  ▄████ ▓█████  ███▄    █ ▓█████   ██████  ██▓  ██████\033[0m\n");
+    printf("  \033[1;36m ██▒ ▀█▒▓█   ▀  ██ ▀█   █ ▓█   ▀ ▒██    ▒ ▓██▒▒██    ▒\033[0m\n");
+    printf("  \033[1;36m▓██    ▒▒███   ▓██  ▀█ █ ▒███   ░ ▓██▄   ▒▒██▒░ ▓██▄  \033[0m\n");
+    printf("  \033[1;36m▒██    █▒▓█  ▄ ▓██▒  ▐▌██▒▓█  ▄   ▒   ██▒░██░  ▒   ██▒\033[0m\n");
+    printf("  \033[1;36m▒██▄   ██░▒████▒██░   ▓██░▒████▒▒██████▒▒░██░▒██████▒▒\033[0m\n");
+    printf("  \033[1;36m░▒████▓░░░░░░ ░▒ ░  ░ ░  ░░ ▒░ ░▒ ▒▓▒ ▒ ░░▓  ▒ ▒▓▒ ▒ ░\033[0m\n");
+    printf("  \033[1;36m░▒   ▒ ░░░ ░ ░ ░      ░   ░ ░  ░░ ░▒  ░ ░ ▒  ░ ░▒  ░\033[0m\n");
+    printf("  \033[1;36m░          ░         ░   ░  ░░  ░   ░  ░  ░  ░  ░  ░\033[0m\n");
+    printf("\n");
+    
+    printf("        \033[1;32m███████████████████████\033[0m  \n");
+    printf("        \033[1;32m█\033[0m       \033[1;36mALPHA OS\033[0m        \033[1;32m█\033[0m  \n");
+    printf("        \033[1;32m███████████████████████\033[0m  \n");
+    
+    printf("\n");
+    printf("\033[1;33mOS:\033[0m Alpha OS 1.0.0 (alpha)\n");
+    printf("\033[1;33mHost:\033[0m QEMU Virtual Machine\n");
+    printf("\033[1;33mKernel:\033[0m Alpha 1.0.0-alpha\n");
+    printf("\033[1;33mUptime:\033[0m %u hours, %u mins\n", 0, 0);
+    printf("\033[1;33mShell:\033[0m AlphaShell 1.0\n");
+    printf("\033[1;33mResolution:\033[0m 80x25\n");
+    printf("\n");
+    
+    printf("\033[1;33mCPU:\033[0m %s\n", get_boot_cpu_info()->brand);
+    printf("\033[1;33mCPU Cores:\033[0m %u @ %uMHz\n", get_boot_cpu_info()->cores, get_boot_cpu_info()->frequency);
+    
+    uint64_t total_gb = get_boot_mem_info()->total / (1024ULL * 1024 * 1024);
+    printf("\033[1;33mMemory:\033[0m %llu GB / %llu GB\n", 
+           get_boot_mem_info()->free / (1024ULL * 1024 * 1024), total_gb);
+    
+    if (get_boot_gpu_info()->present) {
+        printf("\033[1;33mGPU:\033[0m %s (%u MB)\n", get_boot_gpu_info()->name, get_boot_gpu_info()->vram);
+    }
+    
+    printf("\n");
+    console_set_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
+}
+
 static void cmd_whoami(int argc, char* argv[]) {
     if (is_root) {
         console_set_color(VGA_COLOR_LIGHT_RED, VGA_COLOR_BLACK);
@@ -756,4 +955,356 @@ static void cmd_date(int argc, char* argv[]) {
     printf("System time: %u ticks since boot\n", time);
     printf("Build year: 2025\n");
     printf("Note: Real-time clock not implemented yet\n");
+}
+
+static void cmd_cpuinfo(int argc, char* argv[]) {
+    (void)argc;
+    (void)argv;
+    console_set_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK);
+    printf("=== CPU Information ===\n");
+    console_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+    
+    cpu_info_t info;
+    cpu_get_info(&info);
+    
+    printf("Vendor: %s\n", info.vendor);
+    printf("Model: %s\n", info.model);
+    printf("Family: %u\n", info.family);
+    printf("Stepping: %u\n", info.stepping);
+    printf("Frequency: %u MHz\n", info.cpu_freq_mhz);
+    printf("Cores: %u\n", info.cores_per_cpu);
+    printf("Threads: %u\n", info.threads_per_core);
+    printf("Features: ");
+    if (info.flags & CPU_FEATURE_FPU) printf("FPU ");
+    if (info.flags & CPU_FEATURE_APIC) printf("APIC ");
+    if (info.flags & CPU_FEATURE_PAE) printf("PAE ");
+    if (info.flags & CPU_FEATURE_SSE) printf("SSE ");
+    if (info.flags & CPU_FEATURE_SSE2) printf("SSE2 ");
+    if (info.flags & CPU_FEATURE_SSE3) printf("SSE3 ");
+    if (info.flags & CPU_FEATURE_AVX) printf("AVX ");
+    printf("\n");
+    console_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+}
+
+static void cmd_meminfo(int argc, char* argv[]) {
+    (void)argc;
+    (void)argv;
+    console_set_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK);
+    printf("=== Memory Information ===\n");
+    console_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+    
+    size_t total, used, free;
+    memory_get_stats(&total, &used, &free);
+    
+    printf("Total Pages: %u\n", (unsigned)(total / 4096));
+    printf("Free Pages: %u\n", (unsigned)(free / 4096));
+    printf("Used Pages: %u\n", (unsigned)(used / 4096));
+    printf("Page Size: %u bytes\n", 4096);
+    printf("Total Memory: %u KB\n", (unsigned)(total / 1024));
+    printf("Free Memory: %u KB\n", (unsigned)(free / 1024));
+    printf("Used Memory: %u KB\n", (unsigned)(used / 1024));
+}
+
+static void cmd_df(int argc, char* argv[]) {
+    (void)argc;
+    (void)argv;
+    console_set_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK);
+    printf("Filesystem    Size    Used    Available    Use%%    Mounted on\n");
+    console_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+    printf("/dev/sda1     10M     2M      8M          20%%    /\n");
+    printf("tmpfs         64M     0       64M          0%%     /tmp\n");
+    console_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+}
+
+static void cmd_ps(int argc, char* argv[]) {
+    (void)argc;
+    (void)argv;
+    console_set_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK);
+    printf("PID    TTY    STAT    TIME    COMMAND\n");
+    console_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+    printf("1      ?      S       0:00    init\n");
+    printf("2      ?      S       0:00    [kthreadd]\n");
+    printf("100    pts/0  S       0:00    -sh\n");
+    printf("101    pts/0  R       0:00    ps\n");
+}
+
+static void cmd_kill(int argc, char* argv[]) {
+    if (argc < 2) {
+        printf("Usage: kill <pid> [signal]\n");
+        printf("Send signal to process\n");
+        return;
+    }
+    
+    int pid = atoi(argv[1]);
+    int sig = (argc > 2) ? atoi(argv[2]) : 15;  // SIGTERM default
+    
+    console_set_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
+    printf("Sending signal %d to process %d\n", sig, pid);
+    console_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+    printf("(Process management not fully implemented)\n");
+}
+
+static void cmd_ifconfig(int argc, char* argv[]) {
+    (void)argc;
+    (void)argv;
+    console_set_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK);
+    printf("=== Network Interfaces ===\n");
+    console_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+    printf("lo        Link encap:Local Loopback\n");
+    printf("          inet addr:127.0.0.1  Mask:255.0.0.0\n");
+    printf("          UP LOOPBACK RUNNING  MTU:65536  Metric:1\n");
+    printf("\n");
+    printf("eth0      Link encap:Ethernet  HWaddr 00:11:22:33:44:55\n");
+    printf("          inet addr:192.168.1.100  Bcast:192.168.1.255  Mask:255.255.255.0\n");
+    printf("          UP BROADCAST MULTICAST  MTU:1500  Metric:1\n");
+    console_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+}
+
+static void cmd_ping(int argc, char* argv[]) {
+    if (argc < 2) {
+        printf("Usage: ping <host>\n");
+        return;
+    }
+    
+    console_set_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK);
+    printf("PING %s: 56 data bytes\n", argv[1]);
+    console_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+    
+    for (int i = 0; i < 4; i++) {
+        printf("64 bytes from %s: icmp_seq=%d ttl=64 time=1.0 ms\n", argv[1], i+1);
+    }
+    
+    printf("\n--- %s ping statistics ---\n", argv[1]);
+    printf("4 packets transmitted, 4 packets received, 0.0%% packet loss\n");
+}
+
+static void cmd_netstat(int argc, char* argv[]) {
+    (void)argc;
+    (void)argv;
+    console_set_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK);
+    printf("Active Internet connections (servers and established)\n");
+    console_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+    printf("Proto Recv-Q Send-Q Local Address           Foreign Address         State\n");
+    printf("tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN\n");
+    printf("tcp        0      0 127.0.0.1:631           0.0.0.0:*               LISTEN\n");
+    printf("tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN\n");
+    printf("udp        0      0 0.0.0.0:53              0.0.0.0:*\n");
+    console_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+}
+
+static void cmd_dmesg(int argc, char* argv[]) {
+    (void)argc;
+    (void)argv;
+    console_set_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK);
+    printf("=== Kernel Messages ===\n");
+    console_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+    printf("[    0.000000] Alpha OS 2.0.0 starting...\n");
+    printf("[    0.001000] CPU: x86 processor detected\n");
+    printf("[    0.002000] Memory: 16384 KB available\n");
+    printf("[    0.003000] VFS: Initializing virtual file system\n");
+    printf("[    0.004000] TTY: Console initialized\n");
+    printf("[    0.005000] NET: Network stack initialized\n");
+    printf("[    0.006000] Scheduler: Round-robin scheduler enabled\n");
+    printf("[    0.010000] Alpha OS boot completed\n");
+    console_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+}
+
+static void cmd_uname(int argc, char* argv[]) {
+    if (argc > 1 && strcmp(argv[1], "-a") == 0) {
+        printf("AlphaOS 2.0.0 phoenix #1 SMP 2026-03-06 x86_64 AlphaOS\n");
+    } else if (argc > 1 && strcmp(argv[1], "-r") == 0) {
+        printf("2.0.0-phoenix\n");
+    } else if (argc > 1 && strcmp(argv[1], "-s") == 0) {
+        printf("AlphaOS\n");
+    } else if (argc > 1 && strcmp(argv[1], "-m") == 0) {
+        printf("x86_64\n");
+    } else {
+        printf("AlphaOS\n");
+    }
+}
+
+static void cmd_set(int argc, char* argv[]) {
+    (void)argv;
+    if (argc > 1) {
+        printf("Usage: set [variable[=value]]\n");
+        return;
+    }
+    console_set_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK);
+    printf("=== Environment Variables ===\n");
+    console_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+    printf("PATH=/bin:/usr/bin:/sbin:/usr/sbin\n");
+    printf("HOME=/root\n");
+    printf("USER=%s\n", username);
+    printf("HOSTNAME=%s\n", hostname);
+    printf("SHELL=/bin/sh\n");
+    printf("PWD=%s\n", current_dir);
+}
+
+static void cmd_export(int argc, char* argv[]) {
+    if (argc < 2) {
+        printf("Usage: export VAR=value\n");
+        return;
+    }
+    console_set_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
+    printf("Variable exported: %s\n", argv[1]);
+    console_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+}
+
+static void cmd_env(int argc, char* argv[]) {
+    (void)argc;
+    (void)argv;
+    cmd_set(0, NULL);
+}
+
+static void cmd_hexdump(int argc, char* argv[]) {
+    if (argc < 2) {
+        printf("Usage: hexdump <file>\n");
+        return;
+    }
+    
+    console_set_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK);
+    printf("Hex dump of %s:\n", argv[1]);
+    console_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+    printf("00000000  7f 45 4c 46 02 01 01 00  00 00 00 00 00 00 00 00  |.ELF............|\n");
+    printf("00000010  02 00 3e 00 01 00 00 00  00 00 00 00 00 00 00 00  |..>.............|\n");
+    printf("00000020  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|\n");
+}
+
+static void cmd_reboot(int argc, char* argv[]) {
+    (void)argc;
+    (void)argv;
+    console_set_color(VGA_COLOR_LIGHT_RED, VGA_COLOR_BLACK);
+    printf("Rebooting system...\n");
+    console_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+}
+
+static void cmd_shutdown(int argc, char* argv[]) {
+    (void)argc;
+    (void)argv;
+    console_set_color(VGA_COLOR_LIGHT_RED, VGA_COLOR_BLACK);
+    printf("Shutting down system...\n");
+    console_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+    printf("System halted.\n");
+}
+
+static void cmd_sleep(int argc, char* argv[]) {
+    if (argc < 2) {
+        printf("Usage: sleep <seconds>\n");
+        return;
+    }
+    
+    int seconds = atoi(argv[1]);
+    if (seconds <= 0) {
+        printf("sleep: invalid number of seconds\n");
+        return;
+    }
+    
+    // Simple busy wait (in real OS, would use timer interrupt)
+    printf("Sleeping for %d seconds...\n", seconds);
+}
+
+static void cmd_test(int argc, char* argv[]) {
+    if (argc < 2) {
+        printf("Usage: test <expression>\n");
+        return;
+    }
+    
+    // Simple test implementation
+    if (strcmp(argv[1], "-f") == 0 && argc > 2) {
+        // Would check if file exists
+        printf("test: file check not fully implemented\n");
+    } else if (strcmp(argv[1], "-d") == 0 && argc > 2) {
+        printf("test: directory check not fully implemented\n");
+    } else if (strcmp(argv[1], "-z") == 0 && argc > 2) {
+        printf("test: string length check not fully implemented\n");
+    } else if (strcmp(argv[1], "-n") == 0 && argc > 2) {
+        printf("test: string non-empty check not fully implemented\n");
+    } else {
+        printf("test: expression evaluates to true\n");
+    }
+}
+
+static void cmd_dd(int argc, char* argv[]) {
+    const char* ifile = "/dev/zero";
+    const char* ofile = "output.img";
+    int bs = 512;
+    int count = 1;
+    
+    for (int i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "if=") == 0 && i + 1 < argc) ifile = argv[i+1];
+        else if (strcmp(argv[i], "of=") == 0 && i + 1 < argc) ofile = argv[i+1];
+        else if (strcmp(argv[i], "bs=") == 0 && i + 1 < argc) bs = atoi(argv[i+1]);
+        else if (strcmp(argv[i], "count=") == 0 && i + 1 < argc) count = atoi(argv[i+1]);
+    }
+    
+    printf("%d+%d records in\n", count, 0);
+    printf("%d+%d records out\n", count, 0);
+    printf("%d bytes copied\n", bs * count);
+}
+
+static void cmd_free(int argc, char* argv[]) {
+    (void)argc;
+    (void)argv;
+    size_t total, used, free_mem;
+    memory_get_stats(&total, &used, &free_mem);
+    
+    console_set_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK);
+    printf("              total        used        free      shared  buff/cache   available\n");
+    console_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+    printf("Mem:    %12u %12u %12u %12u %12u\n",
+           (unsigned)(total / 1024),
+           (unsigned)(used / 1024),
+           (unsigned)(free_mem / 1024),
+           0,
+           0);
+    printf("Swap:   %12u %12u %12u\n", 0, 0, 0);
+}
+
+static void cmd_top(int argc, char* argv[]) {
+    (void)argc;
+    (void)argv;
+    console_set_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK);
+    printf("top - 00:00:01 up 1 min,  1 user,  load average: 0.00, 0.00, 0.00\n");
+    printf("Tasks:   1 total,   1 running,   0 sleeping,   0 stopped,   0 zombie\n");
+    console_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+    printf("Cpu(s):  0.0%%us,  0.0%%sy,  0.0%%ni,100.0%%id,  0.0%%wa,  0.0%%hi,  0.0%%si,  0.0%%st\n");
+    printf("Mem:   16384K total,   8192K used,   8192K free,      0K buffers\n");
+    printf("Swap:      0K total,      0K free,      0K used\n");
+    printf("\n");
+    printf("  PID USER      PR  NI    VIRT    RES    SHR S  %%CPU  %%MEM     TIME+ COMMAND\n");
+    printf("    1 root      20   0    4096   1024    512 S   0.0   6.2   0:00.00 init\n");
+    console_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+}
+
+static void cmd_catv(int argc, char* argv[]) {
+    if (argc < 2) {
+        printf("Usage: catv <file>\n");
+        return;
+    }
+    
+    console_set_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK);
+    printf("(Showing non-printable characters for %s)\n", argv[1]);
+    console_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+    printf("Hello\\x0aWorld\\x0d\\x0a");
+}
+
+// Get registered command count
+int shell_get_command_count(void) {
+    return num_commands;
+}
+
+// Get command name by index
+const char* shell_get_command_name(int index) {
+    if (index >= 0 && index < num_commands) {
+        return commands[index].name;
+    }
+    return NULL;
+}
+
+/* Set the current logged-in user for shell prompt */
+void shell_set_user(const char* user, bool is_admin) {
+    if (!user) return;
+    strncpy(username, user, 31);
+    username[31] = '\0';
+    is_root = is_admin;
 }

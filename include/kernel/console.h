@@ -1,7 +1,12 @@
 #ifndef CONSOLE_H
 #define CONSOLE_H
 
+// Use standard integer types
+#ifdef TEST_MODE
+#include <stddef.h>
+#else
 #include "types.h"
+#endif
 
 // VGA text mode color constants
 enum vga_color {

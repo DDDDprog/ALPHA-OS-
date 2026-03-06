@@ -53,3 +53,10 @@ void shell_autocomplete(char* buffer, size_t buffer_size);
 void shell_print_enhanced_prompt(void);
 
 #endif // SHELL_H
+
+// Get registered command count
+int shell_get_command_count(void);
+
+// Get command name by index
+const char* shell_get_command_name(int index);
+void shell_set_user(const char* user, bool is_admin);

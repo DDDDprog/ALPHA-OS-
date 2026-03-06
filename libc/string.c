@@ -277,3 +277,13 @@ int split_string(char* str, char* delim, char** tokens, int max_tokens) {
     
     return count;
 }
+
+unsigned short ntohs(unsigned short x) {
+    return ((x & 0x00FF) << 8) | ((x & 0xFF00) >> 8);
+}
+
+int sscanf(const char* str, const char* format, ...) {
+    (void)str;
+    (void)format;
+    return 0;
+}
