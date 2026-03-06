@@ -4,6 +4,8 @@
 #include "../include/kernel/console.h"
 #include "../include/kernel/memory.h"
 #include "../include/kernel/system.h"
+#include "../include/kernel/login.h"
+#include "../include/kernel/score.h"
 #include "../include/libc/stdio.h"
 #include "../include/libc/stdlib.h"
 #include "../include/libc/string.h"
@@ -85,6 +87,11 @@ void shell_init(void) {
     shell_register_command("tree", cmd_tree, "Show directory tree", "tree [directory]");
     shell_register_command("info", cmd_info, "Show system information", "info");
     shell_register_command("whoami", cmd_whoami, "Display current user", "whoami");
+    shell_register_command("login", cmd_login, "Login to system", "login <username> <password>");
+    shell_register_command("logout", cmd_logout, "Logout from system", "logout");
+    shell_register_command("passwd", cmd_passwd, "Change password", "passwd [username]");
+    shell_register_command("score", cmd_score, "Show user score", "score");
+    shell_register_command("achievements", cmd_achievements, "Show achievements", "achievements");
     shell_register_command("hostname", cmd_hostname, "Display or set hostname", "hostname [name]");
     shell_register_command("uptime", cmd_uptime, "Show system uptime", "uptime");
     shell_register_command("calc", cmd_calc, "Simple calculator", "calc <expression>");
@@ -703,6 +710,73 @@ static void cmd_info(int argc, char* argv[]) {
         console_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
     }
     printf("\n");
+}
+
+static void cmd_login(int argc, char* argv[]) {
+    if (argc < 3) {
+        printf("Usage: login <username> <password>\n");
+        return;
+    }
+    auth_result_t result = login(argv[1], argv[2]);
+    if (result == AUTH_SUCCESS) {
+        strncpy(username, argv[1], 31);
+        is_root = false;
+        printf("Welcome to Alpha OS, %s!\n", argv[1]);
+        score_on_event(argv[1], SCORE_EVENT_LOGIN, NULL);
+    } else if (result == AUTH_INVALID_PASSWORD) {
+        printf("Login failed: Invalid password\n");
+    } else if (result == AUTH_ACCOUNT_LOCKED) {
+        printf("Login failed: Account is locked\n");
+    } else {
+        printf("Login failed: User not found\n");
+    }
+}
+
+static void cmd_logout(int argc, char* argv[]) {
+    (void)argc; (void)argv;
+    if (!is_logged_in()) {
+        printf("No user logged in\n");
+        return;
+    }
+    const char* user = get_current_user();
+    logout(user);
+    strcpy(username, "user");
+    is_root = false;
+    printf("Logged out\n");
+}
+
+static void cmd_passwd(int argc, char* argv[]) {
+    if (argc < 2) {
+        if (!is_logged_in()) {
+            printf("Not logged in\n");
+            return;
+        }
+        printf("Usage: passwd <newpassword> (coming soon)\n");
+    } else {
+        printf("Password change not implemented yet\n");
+    }
+}
+
+static void cmd_score(int argc, char* argv[]) {
+    (void)argc; (void)argv;
+    if (!is_logged_in()) {
+        printf("Not logged in. Use 'login' first.\n");
+        return;
+    }
+    const char* user = get_current_user();
+    show_score_summary(user);
+}
+
+static void cmd_achievements(int argc, char* argv[]) {
+    (void)argc; (void)argv;
+    if (!is_logged_in()) {
+        printf("Not logged in. Use 'login' first.\n");
+        return;
+    }
+    const char* user = get_current_user();
+    char buffer[512];
+    achievement_list(user, buffer, sizeof(buffer));
+    printf("\n=== ACHIEVEMENTS ===\n%s", buffer);
 }
 
 static void cmd_whoami(int argc, char* argv[]) {
