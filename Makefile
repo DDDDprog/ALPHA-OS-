@@ -32,10 +32,36 @@ KERNEL_CFLAGS = -m32 -std=gnu99 -ffreestanding -fno-builtin -fno-stack-protector
 
 .PHONY: all clean test help info
 
+# All kernel objects
+KERNEL_OBJS = build/x86/boot.o \
+              build/x86/kernel_main.o \
+              build/x86/kernel_console.o \
+              build/x86/kernel_memory.o \
+              build/x86/kernel_cpu.o \
+              build/x86/kernel_keyboard.o \
+              build/x86/kernel_fs.o \
+              build/x86/kernel_shell.o \
+              build/x86/kernel_system.o \
+              build/x86/kernel_scheduler.o \
+              build/x86/kernel_acpi.o \
+              build/x86/kernel_boot_info.o \
+              build/x86/kernel_device.o \
+              build/x86/kernel_login.o \
+              build/x86/kernel_network.o \
+              build/x86/kernel_persist.o \
+              build/x86/kernel_score.o \
+              build/x86/kernel_syscall.o \
+              build/x86/libc_string.o \
+              build/x86/libc_stdio.o \
+              build/x86/libc_stdlib.o
+
 all: $(BUILD_DIR)/myos.bin
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
+
+$(BUILD_DIR)/kernel_main.o: kernel/main.c | $(BUILD_DIR)
+	$(CC) $(KERNEL_CFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/kernel_%.o: kernel/%.c | $(BUILD_DIR)
 	$(CC) $(KERNEL_CFLAGS) -c $< -o $@
@@ -46,8 +72,8 @@ $(BUILD_DIR)/libc_%.o: libc/%.c | $(BUILD_DIR)
 $(BUILD_DIR)/boot.o: arch/$(ARCH)/boot.asm | $(BUILD_DIR)
 	$(AS) -f elf32 $< -o $@
 
-$(BUILD_DIR)/myos.bin: $(BUILD_DIR)/boot.o arch/$(ARCH)/linker.ld
-	$(LD) -m elf_i386 -nostdlib -T arch/$(ARCH)/linker.ld -o $@ $(wildcard $(BUILD_DIR)/*.o)
+$(BUILD_DIR)/myos.bin: $(KERNEL_OBJS) arch/$(ARCH)/linker.ld
+	$(LD) -m elf_i386 -nostdlib -T arch/$(ARCH)/linker.ld -o $@ $(KERNEL_OBJS)
 
 test: $(BUILD_DIR)/test_fs_shell
 	$(BUILD_DIR)/test_fs_shell

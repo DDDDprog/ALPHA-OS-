@@ -11,15 +11,6 @@
 void memory_init(void) {
     printf("[TEST] Memory subsystem initialized (8MB heap)\n");
 }
-
-void memory_detect(void) {
-    printf("[TEST] Detecting physical memory...\n");
-}
-
-void memory_setup_paging(void) {
-    printf("[TEST] Setting up paging...\n");
-}
-
 void memory_enable_paging(void) {}
 void memory_disable_paging(void) {}
 bool memory_is_paging_enabled(void) { return false; }
@@ -182,6 +173,15 @@ void memory_init(void) {
     free_memory = heap_start->size;
 }
 
+void memory_detect(void) {
+    // Detect physical memory - stub for now
+    total_memory = HEAP_SIZE;
+    free_memory = HEAP_SIZE;
+}
+
+void memory_setup_paging(void) {
+    // Setup paging - stub for now
+}
 static block_header_t* find_free_block(size_t size) {
     block_header_t* current = heap_start;
     

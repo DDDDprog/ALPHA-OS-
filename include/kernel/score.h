@@ -7,6 +7,7 @@
 #define SCORE_H
 
 #include "../kernel/types.h"
+#include "login.h"
 
 /* ============================================================
  * Achievement Categories

@@ -47,6 +47,13 @@ static void cmd_banner(int argc, char* argv[]);
 static void cmd_su(int argc, char* argv[]);
 static void cmd_root_shell(int argc, char* argv[]);
 static void cmd_exit_root(int argc, char* argv[]);
+static void cmd_login(int argc, char* argv[]);
+static void cmd_logout(int argc, char* argv[]);
+static void cmd_passwd(int argc, char* argv[]);
+static void cmd_score(int argc, char* argv[]);
+static void cmd_sysinfo(int argc, char* argv[]);
+static void cmd_neofetch(int argc, char* argv[]);
+static void cmd_achievements(int argc, char* argv[]);
 static void cmd_cpuinfo(int argc, char* argv[]);
 static void cmd_meminfo(int argc, char* argv[]);
 static void cmd_df(int argc, char* argv[]);
@@ -726,7 +733,7 @@ static void cmd_login(int argc, char* argv[]) {
         is_root = false;
         printf("Welcome to Alpha OS, %s!\n", argv[1]);
         score_on_event(argv[1], SCORE_EVENT_LOGIN, NULL);
-    } else if (result == AUTH_INVALID_PASSWORD) {
+    } else if (result == AUTH_INVALID_USER) {
         printf("Login failed: Invalid password\n");
     } else if (result == AUTH_ACCOUNT_LOCKED) {
         printf("Login failed: Account is locked\n");
@@ -790,7 +797,7 @@ static void cmd_sysinfo(int argc, char* argv[]) {
 static void cmd_neofetch(int argc, char* argv[]) {
     (void)argc; (void)argv;
     
-    console_set_color(COLOR_CYAN, COLOR_BLACK);
+    console_set_color(VGA_COLOR_CYAN, VGA_COLOR_BLACK);
     printf("                    ............                  \n");
     printf("               .......:...........               \n");
     printf("            ...:NNNM...........:DD..            \n");
@@ -812,7 +819,7 @@ static void cmd_neofetch(int argc, char* argv[]) {
     printf("              .8MMMMMMMMMMMMMMM8:.             \n");
     printf("                 ..............                \n");
     
-    console_set_color(COLOR_WHITE, COLOR_BLACK);
+    console_set_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
     printf("\n");
     printf("  \033[1;36m  ▄████ ▓█████  ███▄    █ ▓█████   ██████  ██▓  ██████\033[0m\n");
     printf("  \033[1;36m ██▒ ▀█▒▓█   ▀  ██ ▀█   █ ▓█   ▀ ▒██    ▒ ▓██▒▒██    ▒\033[0m\n");
@@ -837,19 +844,19 @@ static void cmd_neofetch(int argc, char* argv[]) {
     printf("\033[1;33mResolution:\033[0m 80x25\n");
     printf("\n");
     
-    printf("\033[1;33mCPU:\033[0m %s\n", boot_cpu.brand);
-    printf("\033[1;33mCPU Cores:\033[0m %u @ %uMHz\n", boot_cpu.cores, boot_cpu.frequency);
+    printf("\033[1;33mCPU:\033[0m %s\n", get_boot_cpu_info()->brand);
+    printf("\033[1;33mCPU Cores:\033[0m %u @ %uMHz\n", get_boot_cpu_info()->cores, get_boot_cpu_info()->frequency);
     
-    uint64_t total_gb = boot_mem.total / (1024ULL * 1024 * 1024);
+    uint64_t total_gb = get_boot_mem_info()->total / (1024ULL * 1024 * 1024);
     printf("\033[1;33mMemory:\033[0m %llu GB / %llu GB\n", 
-           boot_mem.free / (1024ULL * 1024 * 1024), total_gb);
+           get_boot_mem_info()->free / (1024ULL * 1024 * 1024), total_gb);
     
-    if (boot_gpu.present) {
-        printf("\033[1;33mGPU:\033[0m %s (%u MB)\n", boot_gpu.name, boot_gpu.vram);
+    if (get_boot_gpu_info()->present) {
+        printf("\033[1;33mGPU:\033[0m %s (%u MB)\n", get_boot_gpu_info()->name, get_boot_gpu_info()->vram);
     }
     
     printf("\n");
-    console_set_color(COLOR_WHITE, COLOR_BLACK);
+    console_set_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
 }
 
 static void cmd_whoami(int argc, char* argv[]) {
@@ -963,18 +970,18 @@ static void cmd_cpuinfo(int argc, char* argv[]) {
     printf("Vendor: %s\n", info.vendor);
     printf("Model: %s\n", info.model);
     printf("Family: %u\n", info.family);
-    printf("Model ID: %u\n", info.model_id);
     printf("Stepping: %u\n", info.stepping);
-    printf("Frequency: %u MHz\n", info.mhz);
+    printf("Frequency: %u MHz\n", info.cpu_freq_mhz);
+    printf("Cores: %u\n", info.cores_per_cpu);
+    printf("Threads: %u\n", info.threads_per_core);
     printf("Features: ");
-    if (info.flags & CPU_FLAG_FPU) printf("FPU ");
-    if (info.flags & CPU_FLAG_MMX) printf("MMX ");
-    if (info.flags & CPU_FLAG_SSE) printf("SSE ");
-    if (info.flags & CPU_FLAG_SSE2) printf("SSE2 ");
-    if (info.flags & CPU_FLAG_SSE3) printf("SSE3 ");
-    if (info.flags & CPU_FLAG_TSC) printf("TSC ");
-    if (info.flags & CPU_FLAG_PAE) printf("PAE ");
-    if (info.flags & CPU_FLAG_APIC) printf("APIC ");
+    if (info.flags & CPU_FEATURE_FPU) printf("FPU ");
+    if (info.flags & CPU_FEATURE_APIC) printf("APIC ");
+    if (info.flags & CPU_FEATURE_PAE) printf("PAE ");
+    if (info.flags & CPU_FEATURE_SSE) printf("SSE ");
+    if (info.flags & CPU_FEATURE_SSE2) printf("SSE2 ");
+    if (info.flags & CPU_FEATURE_SSE3) printf("SSE3 ");
+    if (info.flags & CPU_FEATURE_AVX) printf("AVX ");
     printf("\n");
     console_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
 }
@@ -986,16 +993,16 @@ static void cmd_meminfo(int argc, char* argv[]) {
     printf("=== Memory Information ===\n");
     console_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
     
-    memory_stats_t stats;
-    memory_get_stats(&stats);
+    size_t total, used, free;
+    memory_get_stats(&total, &used, &free);
     
-    printf("Total Pages: %u\n", stats.total_pages);
-    printf("Free Pages: %u\n", stats.free_pages);
-    printf("Used Pages: %u\n", stats.used_pages);
+    printf("Total Pages: %u\n", (unsigned)(total / 4096));
+    printf("Free Pages: %u\n", (unsigned)(free / 4096));
+    printf("Used Pages: %u\n", (unsigned)(used / 4096));
     printf("Page Size: %u bytes\n", 4096);
-    printf("Total Memory: %u KB\n", stats.total_pages * 4);
-    printf("Free Memory: %u KB\n", stats.free_pages * 4);
-    printf("Used Memory: %u KB\n", stats.used_pages * 4);
+    printf("Total Memory: %u KB\n", (unsigned)(total / 1024));
+    printf("Free Memory: %u KB\n", (unsigned)(free / 1024));
+    printf("Used Memory: %u KB\n", (unsigned)(used / 1024));
 }
 
 static void cmd_df(int argc, char* argv[]) {
@@ -1238,16 +1245,16 @@ static void cmd_dd(int argc, char* argv[]) {
 static void cmd_free(int argc, char* argv[]) {
     (void)argc;
     (void)argv;
-    memory_stats_t stats;
-    memory_get_stats(&stats);
+    size_t total, used, free_mem;
+    memory_get_stats(&total, &used, &free_mem);
     
     console_set_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK);
     printf("              total        used        free      shared  buff/cache   available\n");
     console_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
     printf("Mem:    %12u %12u %12u %12u %12u\n",
-           stats.total_pages * 4,
-           stats.used_pages * 4,
-           stats.free_pages * 4,
+           (unsigned)(total / 1024),
+           (unsigned)(used / 1024),
+           (unsigned)(free_mem / 1024),
            0,
            0);
     printf("Swap:   %12u %12u %12u\n", 0, 0, 0);
@@ -1279,4 +1286,17 @@ static void cmd_catv(int argc, char* argv[]) {
     printf("(Showing non-printable characters for %s)\n", argv[1]);
     console_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
     printf("Hello\\x0aWorld\\x0d\\x0a");
+}
+
+// Get registered command count
+int shell_get_command_count(void) {
+    return num_commands;
+}
+
+// Get command name by index
+const char* shell_get_command_name(int index) {
+    if (index >= 0 && index < num_commands) {
+        return commands[index].name;
+    }
+    return NULL;
 }

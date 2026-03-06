@@ -98,9 +98,9 @@ int achievement_unlock(const char* username, const char* achv_id) {
                 achievements[i].unlocked = true;
                 strncpy(achievements[i].unlocked_by, username, MAX_USERNAME_LEN - 1);
                 score_add(username, achievements[i].points);
-                console_set_color(COLOR_YELLOW, COLOR_BLACK);
+                console_set_color(VGA_COLOR_YELLOW, VGA_COLOR_BLACK);
                 printf("\n[ACHIEVEMENT] %s - %s (+%u pts)\n", achievements[i].name, achievements[i].description, achievements[i].points);
-                console_set_color(COLOR_WHITE, COLOR_BLACK);
+                console_set_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
             }
             return 0;
         }
@@ -146,15 +146,15 @@ int leaderboard_get(char* buffer, size_t len, size_t max_entries) {
 
 void show_score_summary(const char* username) {
     if (!username) return;
-    console_set_color(COLOR_CYAN, COLOR_BLACK);
+    console_set_color(VGA_COLOR_CYAN, VGA_COLOR_BLACK);
     printf("\n=== SCORE ===\nUser: %s\nLevel: %u\nPoints: %u\nCommands: %u\nStreak: %u\n============\n",
            username, current_user_score.level, current_user_score.total_points, current_user_score.commands_run, current_user_score.login_streak);
-    console_set_color(COLOR_WHITE, COLOR_BLACK);
+    console_set_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
 }
 
 void show_achievement_unlocked(achievement_t* achv) {
     if (!achv) return;
-    console_set_color(COLOR_YELLOW, COLOR_BLACK);
+    console_set_color(VGA_COLOR_YELLOW, VGA_COLOR_BLACK);
     printf("\n*** ACHIEVEMENT: %s ***\n%s (+%u pts)\n", achv->name, achv->description, achv->points);
-    console_set_color(COLOR_WHITE, COLOR_BLACK);
+    console_set_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
 }

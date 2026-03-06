@@ -72,7 +72,7 @@ int network_shutdown(void) {
  * ============================================================ */
 
 network_interface_t* network_interface_create(const char* name) {
-    network_interface_t* iface = malloc(sizeof(network_interface_t));
+    network_interface_t* iface = ((network_interface_t*)malloc(sizeof(network_interface_t)));
     if (!iface) return NULL;
     
     memset(iface, 0, sizeof(network_interface_t));
@@ -265,7 +265,7 @@ int socket_init(void) {
 socket_t* socket(int domain, int type, int protocol) {
     if (domain != AF_INET) return NULL;
     
-    socket_t* sock = malloc(sizeof(socket_t));
+    socket_t* sock = ((socket_t*)malloc(sizeof(socket_t)));
     if (!sock) return NULL;
     
     memset(sock, 0, sizeof(socket_t));

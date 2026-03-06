@@ -9,7 +9,7 @@
 #include "../kernel/types.h"
 
 /* ============================================================
- * CPU Information
+ * Boot CPU Information (for diagnostics)
  * ============================================================ */
 
 #define CPU_VENDOR_LEN  16
@@ -33,8 +33,9 @@ typedef struct {
     bool has_pae;
     bool has_sse;
     bool has_avx;
+    bool has_avx2;
     bool is_64bit;
-} cpu_info_t;
+} boot_cpu_info_t;
 
 /* ============================================================
  * Memory Information  
@@ -127,7 +128,7 @@ typedef struct {
 int boot_diagnostics_init(void);
 
 /* CPU */
-int cpu_detect(cpu_info_t* info);
+int boot_cpu_detect(boot_cpu_info_t* info);
 void cpu_print_info(void);
 
 /* Memory */
@@ -165,5 +166,10 @@ void apic_print_info(void);
 
 /* DMI/SMBIOS info */
 void dmi_print_info(void);
+
+/* Get boot diagnostics data */
+boot_cpu_info_t* get_boot_cpu_info(void);
+mem_info_t* get_boot_mem_info(void);
+gpu_info_t* get_boot_gpu_info(void);
 
 #endif /* BOOT_INFO_H */

@@ -379,7 +379,7 @@ int tty_init(void) {
 }
 
 int tty_register(void) {
-    device_t* tty = malloc(sizeof(device_t));
+    device_t* tty = (device_t*)malloc(sizeof(device_t));
     if (!tty) return -1;
     
     memset(tty, 0, sizeof(device_t));
@@ -398,7 +398,7 @@ int rtc_init(void) {
 }
 
 int rtc_register(void) {
-    device_t* rtc = malloc(sizeof(device_t));
+    device_t* rtc = (device_t*)malloc(sizeof(device_t));
     if (!rtc) return -1;
     
     memset(rtc, 0, sizeof(device_t));

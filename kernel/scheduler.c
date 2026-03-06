@@ -316,9 +316,7 @@ void scheduler_get_stats(scheduler_stats_t* stats) {
 void context_switch(process_context_t* old_ctx, process_context_t* new_ctx) {
     (void)old_ctx;
     (void)new_ctx;
-    // In a real implementation, this would save and restore all registers
-    __asm__ volatile ("pushad");
-    __asm__ volatile ("popad");
+    // Stub - in real implementation this would save/restore registers
 }
 
 void idle_process(void* arg) {

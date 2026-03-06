@@ -168,7 +168,7 @@ auth_result_t login(const char* username, const char* password) {
         u->failed_attempts++;
         printf("[AUTH] Login failed for '%s' (attempt %u)\n", username, u->failed_attempts);
         if (u->failed_attempts >= 5) { u->is_locked = true; printf("[AUTH] Account '%s' locked\n", username); }
-        return AUTH_INVALID_PASSWORD;
+        return AUTH_INVALID_USER;
     }
     u->login_count++;
     u->failed_attempts = 0;
@@ -233,7 +233,7 @@ int unlock_account(const char* username) {
 /* Boot theme */
 void show_login_theme(void) {
     console_clear();
-    console_set_color(COLOR_GREEN, COLOR_BLACK);
+    console_set_color(VGA_COLOR_GREEN, VGA_COLOR_BLACK);
     printf("\n");
     printf("  ╔═══════════════════════════════════════════════════════════╗\n");
     printf("  ║                                                           ║\n");
@@ -249,14 +249,14 @@ void show_login_theme(void) {
     printf("  ║                                                           ║\n");
     printf("  ╚═══════════════════════════════════════════════════════════╝\n");
     printf("\n");
-    console_set_color(COLOR_WHITE, COLOR_BLACK);
+    console_set_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
 }
 
 void show_banner(void) {
-    console_set_color(COLOR_CYAN, COLOR_BLACK);
+    console_set_color(VGA_COLOR_CYAN, VGA_COLOR_BLACK);
     printf("╔══════════════════════════════════════════════════════════╗\n");
     printf("║  ALPHA OS - Boot Complete                              ║\n");
     printf("║  Copyright (c) 2024 Alpha OS Team                      ║\n");
     printf("╚══════════════════════════════════════════════════════════╝\n");
-    console_set_color(COLOR_WHITE, COLOR_BLACK);
+    console_set_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
 }

@@ -131,29 +131,19 @@ void panic(const char* msg) {
 }
 
 void dump_registers(void) {
-#ifndef TEST_MODE
-    uint32_t eax, ebx, ecx, edx, esi, edi, ebp, esp, eip, eflags;
-    
-    __asm__ volatile (
-        "mov %%eax, %0\n"
-        "mov %%ebx, %1\n"
-        "mov %%ecx, %2\n"
-        "mov %%edx, %3\n"
-        "mov %%esi, %4\n"
-        "mov %%edi, %5\n"
-        "mov %%ebp, %6\n"
-        "mov %%esp, %7\n"
-        "mov 0(%%esp), %8\n"
-        "pushf\n pop %9"
-        : "=r"(eax), "=r"(ebx), "=r"(ecx), "=r"(edx),
-          "=r"(esi), "=r"(edi), "=r"(ebp), "=r"(esp), "=r"(eip), "=r"(eflags)
-    );
-    
-    printf("Registers:\n");
-    printf("  EAX=0x%08X EBX=0x%08X ECX=0x%08X EDX=0x%08X\n", eax, ebx, ecx, edx);
-    printf("  ESI=0x%08X EDI=0x%08X EBP=0x%08X ESP=0x%08X\n", esi, edi, ebp, esp);
-    printf("  EIP=0x%08X EFLAGS=0x%08X\n", eip, eflags);
-#else
+#ifdef TEST_MODE
     printf("Register dump not available in test mode\n");
+#else
+    uint32_t eax = 0, ebx = 0, ecx = 0, edx = 0;
+    uint32_t esi = 0, edi = 0, ebp = 0, esp = 0, eip = 0, eflags = 0;
+    
+    // Read CR0-CR4
+    __asm__ volatile ("mov %%cr0, %%eax" : "=a"(eax));
+    __asm__ volatile ("mov %%cr2, %%eax" : "=a"(ecx));
+    __asm__ volatile ("mov %%cr3, %%eax" : "=a"(edx));
+    __asm__ volatile ("mov %%cr4, %%eax" : "=a"(esi));
+    
+    printf("Control Registers:\n");
+    printf("  CR0=0x%08X CR2=0x%08X CR3=0x%08X CR4=0x%08X\n", eax, ecx, edx, esi);
 #endif
 }

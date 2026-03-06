@@ -15,7 +15,7 @@
 #endif
 
 static bool diagnostics_initialized = false;
-static cpu_info_t boot_cpu;
+static boot_cpu_info_t boot_cpu;
 static mem_info_t boot_mem;
 static gpu_info_t boot_gpu;
 
@@ -26,15 +26,15 @@ static gpu_info_t boot_gpu;
 int boot_diagnostics_init(void) {
     if (diagnostics_initialized) return 0;
     
-    console_set_color(COLOR_CYAN, COLOR_BLACK);
+    console_set_color(VGA_COLOR_CYAN, VGA_COLOR_BLACK);
     printf("\n");
     printf("    ALPHA OS Boot Menu v1.0.0\n");
     printf("    ===========================\n");
-    console_set_color(COLOR_WHITE, COLOR_BLACK);
+    console_set_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
     printf("\n");
     
     /* Detect all hardware */
-    cpu_detect(&boot_cpu);
+    boot_cpu_detect(&boot_cpu);
     mem_detect(&boot_mem);
     gpu_detect(&boot_gpu);
     
@@ -46,13 +46,13 @@ int boot_diagnostics_init(void) {
  * CPU Detection
  * ============================================================ */
 
-int cpu_detect(cpu_info_t* info) {
+int boot_cpu_detect(boot_cpu_info_t* info) {
     if (!info) return -1;
     
-    console_set_color(COLOR_YELLOW, COLOR_BLACK);
+    console_set_color(VGA_COLOR_YELLOW, VGA_COLOR_BLACK);
     printf("[    0.000000] Alpha OS boot_params 0x00000000\n");
     printf("[    0.000000] Command line: BOOT_IMAGE=/boot/alpha root=/dev/sda1 ro quiet\n");
-    console_set_color(COLOR_WHITE, COLOR_BLACK);
+    console_set_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
     
     /* Try to detect real CPU using CPUID */
     bool has_cpuid = false;
@@ -104,11 +104,11 @@ int cpu_detect(cpu_info_t* info) {
 }
 
 void cpu_print_info(void) {
-    console_set_color(COLOR_LIGHT_CYAN, COLOR_BLACK);
+    console_set_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK);
     printf("\n╔══════════════════════════════════════════════════════════════╗\n");
     printf("║                      CPU INFORMATION                        ║\n");
     printf("╠══════════════════════════════════════════════════════════════╣\n");
-    console_set_color(COLOR_WHITE, COLOR_BLACK);
+    console_set_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
     printf("║ Vendor:    %-48s ║\n", boot_cpu.vendor);
     printf("║ Model:     %-48s ║\n", boot_cpu.brand);
     printf("║ Cores:     %-48u ║\n", boot_cpu.cores);
@@ -117,13 +117,13 @@ void cpu_print_info(void) {
     printf("║ L1 Cache:  %-48u KB ║\n", boot_cpu.cache_l1);
     printf("║ L2 Cache:  %-48u KB ║\n", boot_cpu.cache_l2);
     printf("║ L3 Cache:  %-48u KB ║\n", boot_cpu.cache_l3);
-    console_set_color(COLOR_LIGHT_CYAN, COLOR_BLACK);
+    console_set_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK);
     printf("║ Flags:     %-48s ║\n", 
            "fpu pae sse sse2 sse3 ssse3 sse4_1 sse4_2 avx avx2 aes");
-    console_set_color(COLOR_WHITE, COLOR_BLACK);
+    console_set_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
     printf("║ 64-bit:    %-48s ║\n", boot_cpu.is_64bit ? "Yes" : "No");
     printf("╚══════════════════════════════════════════════════════════════╝\n");
-    console_set_color(COLOR_WHITE, COLOR_BLACK);
+    console_set_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
 }
 
 /* ============================================================
@@ -152,11 +152,11 @@ int mem_detect(mem_info_t* info) {
 }
 
 void mem_print_info(void) {
-    console_set_color(COLOR_LIGHT_CYAN, COLOR_BLACK);
+    console_set_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK);
     printf("\n╔══════════════════════════════════════════════════════════════╗\n");
     printf("║                    MEMORY INFORMATION                        ║\n");
     printf("╠══════════════════════════════════════════════════════════════╣\n");
-    console_set_color(COLOR_WHITE, COLOR_BLACK);
+    console_set_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
     
     uint64_t total_gb = boot_mem.total / (1024ULL * 1024 * 1024);
     uint64_t free_gb = boot_mem.free / (1024ULL * 1024 * 1024);
@@ -169,9 +169,9 @@ void mem_print_info(void) {
     printf("║ Cached:          %llu MB                             ║\n", boot_mem.cached / (1024 * 1024));
     printf("║ Memory Modules:   %u                                      ║\n", boot_mem.num_modules);
     
-    console_set_color(COLOR_LIGHT_CYAN, COLOR_BLACK);
+    console_set_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK);
     printf("╚══════════════════════════════════════════════════════════════╝\n");
-    console_set_color(COLOR_WHITE, COLOR_BLACK);
+    console_set_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
 }
 
 /* ============================================================
@@ -201,26 +201,26 @@ int gpu_detect(gpu_info_t* info) {
 }
 
 void gpu_print_info(void) {
-    console_set_color(COLOR_LIGHT_CYAN, COLOR_BLACK);
+    console_set_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK);
     printf("\n╔══════════════════════════════════════════════════════════════╗\n");
     printf("║                     GPU INFORMATION                          ║\n");
     printf("╠══════════════════════════════════════════════════════════════╣\n");
-    console_set_color(COLOR_WHITE, COLOR_BLACK);
+    console_set_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
     
     if (boot_gpu.present) {
         printf("║ Name:        %-48s ║\n", boot_gpu.name);
         printf("║ VRAM:        %-48u MB ║\n", boot_gpu.vram);
         printf("║ Frequency:   %-48u MHz ║\n", boot_gpu.frequency);
-        console_set_color(COLOR_WHITE, COLOR_BLACK);
+        console_set_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
         printf("║ 2D Accel:    %-48s ║\n", boot_gpu.accel_2d ? "Yes" : "No");
         printf("║ 3D Accel:    %-48s ║\n", boot_gpu.accel_3d ? "Yes" : "No");
     } else {
         printf("║ No GPU detected                                       ║\n");
     }
     
-    console_set_color(COLOR_LIGHT_CYAN, COLOR_BLACK);
+    console_set_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK);
     printf("╚══════════════════════════════════════════════════════════════╝\n");
-    console_set_color(COLOR_WHITE, COLOR_BLACK);
+    console_set_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
 }
 
 /* ============================================================
@@ -257,11 +257,11 @@ void storage_print_info(void) {
     int count = 0;
     storage_detect(devs, &count);
     
-    console_set_color(COLOR_LIGHT_CYAN, COLOR_BLACK);
+    console_set_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK);
     printf("\n╔══════════════════════════════════════════════════════════════╗\n");
     printf("║                   STORAGE DEVICES                           ║\n");
     printf("╠══════════════════════════════════════════════════════════════╣\n");
-    console_set_color(COLOR_WHITE, COLOR_BLACK);
+    console_set_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
     
     for (int i = 0; i < count; i++) {
         uint64_t size_gb = devs[i].size / (1024ULL * 1024 * 1024);
@@ -269,9 +269,9 @@ void storage_print_info(void) {
                devs[i].name, devs[i].model, size_gb);
     }
     
-    console_set_color(COLOR_LIGHT_CYAN, COLOR_BLACK);
+    console_set_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK);
     printf("╚══════════════════════════════════════════════════════════════╝\n");
-    console_set_color(COLOR_WHITE, COLOR_BLACK);
+    console_set_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
 }
 
 /* ============================================================
@@ -311,11 +311,11 @@ void net_print_info(void) {
     int count = 0;
     net_detect(devs, &count);
     
-    console_set_color(COLOR_LIGHT_CYAN, COLOR_BLACK);
+    console_set_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK);
     printf("\n╔══════════════════════════════════════════════════════════════╗\n");
     printf("║                    NETWORK DEVICES                          ║\n");
     printf("╠══════════════════════════════════════════════════════════════╣\n");
-    console_set_color(COLOR_WHITE, COLOR_BLACK);
+    console_set_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
     
     for (int i = 0; i < count; i++) {
         printf("║ %-6s: %-18s %-15s %s  ║\n", 
@@ -324,9 +324,9 @@ void net_print_info(void) {
                "");
     }
     
-    console_set_color(COLOR_LIGHT_CYAN, COLOR_BLACK);
+    console_set_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK);
     printf("╚══════════════════════════════════════════════════════════════╝\n");
-    console_set_color(COLOR_WHITE, COLOR_BLACK);
+    console_set_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
 }
 
 /* ============================================================
@@ -348,11 +348,11 @@ void boot_show_all(void) {
 
 void boot_message_start(void) {
     console_clear();
-    console_set_color(COLOR_LIGHT_GREEN, COLOR_BLACK);
+    console_set_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
     printf("\n");
     printf("    ALPHA OS 1.0.0 alpha    \n");
     printf("    ════════════════════════════════════    \n");
-    console_set_color(COLOR_WHITE, COLOR_BLACK);
+    console_set_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
     printf("[    0.000000] Alpha OS version 1.0.0-alpha\n");
     printf("[    0.000000] Command line: BOOT_IMAGE=/boot/alpha root=/dev/sda1 ro quiet splash\n");
     printf("[    0.000000] x86/fpu: Using FPU save instructions\n");
@@ -363,16 +363,16 @@ void boot_message_start(void) {
     printf("[    0.000000] SMBIOS 3.3.0 present.\n");
     printf("[    0.000000] DMI: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.0.0 04/01/2014\n");
     printf("[    0.000000] Hypervisor detected: KVM\n");
-    console_set_color(COLOR_CYAN, COLOR_BLACK);
+    console_set_color(VGA_COLOR_CYAN, VGA_COLOR_BLACK);
     printf("\n");
 }
 
 void boot_message_end(void) {
-    console_set_color(COLOR_LIGHT_GREEN, COLOR_BLACK);
+    console_set_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
     printf("\n[    2.345678] ALPHA OS started.\n");
     printf("              Welcome to Alpha OS 1.0.0\n");
     printf("\n");
-    console_set_color(COLOR_WHITE, COLOR_BLACK);
+    console_set_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
 }
 
 /* Stub functions */
@@ -385,3 +385,16 @@ void pci_print_devices(void) { }
 void serial_detect(void) { }
 void apic_print_info(void) { }
 void dmi_print_info(void) { }
+
+/* Get boot diagnostics data */
+boot_cpu_info_t* get_boot_cpu_info(void) {
+    return &boot_cpu;
+}
+
+mem_info_t* get_boot_mem_info(void) {
+    return &boot_mem;
+}
+
+gpu_info_t* get_boot_gpu_info(void) {
+    return &boot_gpu;
+}

@@ -56,8 +56,8 @@ int acpi_shutdown(void) {
 #endif
 
 bool acpi_enabled(void) { return acpi_present; }
-void* acpi_get_rsdp(void) { return rsdp; }
-bool acpi_validate_rsdp(void* ptr) { (void)ptr; return false; }
+acpi_rsdp_t* acpi_get_rsdp(void) { return rsdp; }
+bool acpi_validate_rsdp(acpi_rsdp_t* ptr) { (void)ptr; return false; }
 
 int acpi_sleep(uint8_t state) {
     printf("[ACPI] Entering S%d\n", state);
@@ -75,7 +75,6 @@ void acpi_wait_ms(uint32_t ms) { (void)ms; }
 
 #ifdef TEST_MODE
 
-int rtc_init(void) {
     printf("[RTC] Real-time clock initialized\n");
     return 0;
 }
@@ -98,7 +97,6 @@ void rtc_read_date(uint16_t* year, uint8_t* month, uint8_t* day) {
 
 #else
 
-int rtc_init(void) { return 0; }
 
 void rtc_read_time(uint8_t* hour, uint8_t* min, uint8_t* sec) {
     (void)hour; (void)min; (void)sec;
@@ -199,7 +197,7 @@ int cmos_set_last_shutdown(uint8_t reason) {
 
 uint8_t cmos_get_last_shutdown(void) { return 0xFF; }
 
-int battery_get_info(void* info) {
+int battery_get_info(battery_info_t* info) {
     (void)info;
     return -1;
 }

@@ -39,3 +39,13 @@ typedef enum {
 #endif
 
 #endif // TYPES_H
+#ifndef TIME_T
+#define TIME_T
+typedef unsigned long time_t;
+#endif
+typedef unsigned long sigset_t;
+typedef long suseconds_t;
+typedef long off_t;
+
+/* Network byte order */
+unsigned short ntohs(unsigned short x);
