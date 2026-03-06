@@ -1,0 +1,59 @@
+# Alpha OS - Git Ignore
+
+# Build outputs
+build/
+*.o
+*.a
+*.so
+*.dylib
+*.dll
+
+# Kernel images
+*.bin
+*.iso
+*.img
+*.img.gz
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+CMakeLists.txt.user
+CMakeGraphVizOptions.cmake
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Documentation builds
+docs/_build/
+*.pdf
+
+# Testing
+*.log
+*.tmp
+ Testing/
+
+# Backup files
+*.bak
+*.old
+
+# Core dumps
+core
+core.*
+
+# Temporary files
+*.tmp
+*.temp
+/tmp/
+
+# Release archives
+release/
+dist/
+*.tar.gz
+*.zip

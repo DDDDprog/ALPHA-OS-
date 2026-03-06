@@ -4,6 +4,8 @@
 #include "../include/kernel/memory.h"
 #include "../include/kernel/shell.h"
 #include "../include/kernel/system.h"
+#include "../include/kernel/cpu.h"
+#include "../include/kernel/scheduler.h"
 #include "../include/libc/stdio.h"
 #include "../include/libc/string.h"
 
@@ -13,15 +15,37 @@ void kernel_main(void) {
     // Initialize kernel components
     console_init();
     memory_init();
+    memory_detect();
+    memory_setup_paging();
+    cpu_init();
     keyboard_init();
     system_init();
+    scheduler_init();
     
     // Display welcome message
     console_set_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK);
-    printf("Alpha OS - Advanced Learning Platform\n");
+    printf("======================================\n");
+    printf("   Alpha OS 2.0 - Modern Kernel\n");
+    printf("======================================\n");
     console_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
-    printf("Version 1.0.0 | AlphaKernel | Build 2025\n");
-    printf("Built with standard GCC for educational purposes\n\n");
+    printf("Version 2.0.0 | AlphaKernel | Build 2026\n");
+    printf("Built with modern GCC for educational purposes\n\n");
+    
+    // Display CPU info
+    cpu_info_t cpu_info;
+    cpu_get_info(&cpu_info);
+    console_set_color(VGA_COLOR_YELLOW, VGA_COLOR_BLACK);
+    printf("[CPU] Vendor: %s\n", cpu_info.vendor);
+    printf("[CPU] Features: 0x%08X\n", cpu_info.features);
+    console_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+    
+    // Display memory info
+    memory_stats_t mem_stats;
+    memory_get_extended_stats(&mem_stats);
+    console_set_color(VGA_COLOR_YELLOW, VGA_COLOR_BLACK);
+    printf("[MEM] Total Pages: %u\n", mem_stats.total_pages);
+    printf("[MEM] Free Pages: %u\n", mem_stats.free_pages);
+    console_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
     
     // Initialize file system
     console_set_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
@@ -39,7 +63,9 @@ void kernel_main(void) {
     
     printf("\n");
     console_set_color(VGA_COLOR_LIGHT_BROWN, VGA_COLOR_BLACK);
-    printf("Welcome to Alpha OS 2025! Type 'help' for commands or 'root' for admin access.\n");
+    printf("Welcome to Alpha OS 2.0! Type 'help' for commands or 'root' for admin access.\n");
+    console_set_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK);
+    printf("New Features: Process Scheduling | Virtual Memory | CPU Detection\n");
     console_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
     printf("\n");
     

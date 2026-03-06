@@ -1,0 +1,71 @@
+# Alpha OS - Code Style Configuration
+
+# C/C++ formatting
+based_on_style = LLVM
+indent_width = 4
+tab_width = 4
+use_tab = never
+column_limit = 100
+
+# Language settings
+Language = C
+BasedOnStyle = LLVM
+
+# Specific settings
+AlignAfterOpenBracket = Align
+AlignConsecutiveAssignments = false
+AlignConsecutiveDeclarations = false
+AlignOperands = true
+AlignTrailingComments = true
+AllowAllParametersOfDeclarationOnNextLine = true
+AllowShortBlocksOnASingleLine = false
+AllowShortCaseLabelsOnASingleLine = false
+AllowShortFunctionsOnASingleLine = Empty
+AllowShortIfStatementsOnASingleLine = false
+AllowShortLoopsOnASingleLine = false
+
+# Braces
+BraceWrapping:
+  AfterClass: false
+  AfterControlStatement: false
+  AfterEnum: false
+  AfterFunction: false
+  AfterNamespace: false
+  AfterStruct: false
+  AfterUnion: false
+  BeforeCatch: false
+  BeforeElse: false
+  IndentBraces: false
+
+# Indentation
+IndentCaseLabels: true
+IndentPPDirectives: AfterHash
+IndentWrappedFunctionNames: false
+
+# Spaces
+SpaceAfterCStyleCast: false
+SpaceAfterTemplateKeyword: true
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeCpp11BracedList: false
+SpaceBeforeCtorInitializerColon: true
+SpaceBeforeInheritanceColon: true
+SpaceBeforeParens: ControlStatements
+SpaceBeforeRangeBasedForLoopColon: true
+SpaceInEmptyParentheses: false
+SpacesBeforeTrailingComments: 2
+SpacesInAngles: false
+SpacesInCStyleCastParentheses: false
+SpacesInContainerLiterals: false
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+
+# Line spacing
+MaxEmptyLinesToKeep = 1
+KeepEmptyLinesAtEOF = false
+
+# Comments
+ReflowComments: true
+
+# Includes
+SortIncludes: true
+IncludeBlocks: Regroup

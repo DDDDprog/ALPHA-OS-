@@ -1,7 +1,9 @@
 #ifndef TYPES_H
 #define TYPES_H
 
-// Basic type definitions
+// Basic type definitions - only for kernel mode
+#ifndef TEST_MODE
+
 typedef unsigned char uint8_t;
 typedef unsigned short uint16_t;
 typedef unsigned int uint32_t;
@@ -28,5 +30,12 @@ typedef enum {
     false = 0,
     true = 1
 } bool;
+
+#else
+// In test mode, use standard library types
+#include <stdint.h>
+#include <stdbool.h>
+#include <stddef.h>
+#endif
 
 #endif // TYPES_H
