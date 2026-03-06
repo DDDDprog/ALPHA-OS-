@@ -1300,3 +1300,11 @@ const char* shell_get_command_name(int index) {
     }
     return NULL;
 }
+
+/* Set the current logged-in user for shell prompt */
+void shell_set_user(const char* user, bool is_admin) {
+    if (!user) return;
+    strncpy(username, user, 31);
+    username[31] = '\0';
+    is_root = is_admin;
+}

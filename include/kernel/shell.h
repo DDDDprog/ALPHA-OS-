@@ -59,3 +59,4 @@ int shell_get_command_count(void);
 
 // Get command name by index
 const char* shell_get_command_name(int index);
+void shell_set_user(const char* user, bool is_admin);
